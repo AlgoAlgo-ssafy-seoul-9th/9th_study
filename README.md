@@ -122,7 +122,7 @@ print(point)
 <summary>접기/펼치기</summary>
 <div markdown="1">
 
-## [민웅](<./KCPC/민웅.py>)
+## [민웅](./KCPC/민웅.py)
 
 ```py
 # 3758_KCPC
@@ -178,7 +178,7 @@ for _ in range(T):
 
 ```
 
-## [병국](<./KCPC/병국.py>)
+## [병국](./KCPC/병국.py)
 
 ```py
 t = int(input())
@@ -212,13 +212,13 @@ for _ in range(t):
 
 ```
 
-## [상미](<./KCPC/상미.py>)
+## [상미](./KCPC/상미.py)
 
 ```py
 
 ```
 
-## [서희](<./KCPC/서희.py>)
+## [서희](./KCPC/서희.py)
 
 ```py
 import sys
@@ -246,10 +246,55 @@ for _ in range(T):
 
 ```
 
-## [성구](<./KCPC/성구.py>)
+## [성구](./KCPC/성구.py)
 
 ```py
+# 3758 KCPC
+import sys
+from collections import defaultdict
 
+input = sys.stdin.readline
+
+for _ in range(int(input())):
+    # input
+    # 팀 개수, 문제 개수, 내 팀 id, 로그 엔트리
+    n, k, t, m = map(int, input().split())
+    # define
+    # 아이디별 {제출횟수, 마지막 제출 시간, 문제별 점수(list)}
+    score = {}
+    rank = []
+    for idx in range(m):
+        i, j, s = map(int, input().split())
+        if i in score.keys():
+            sub_cnt, _, scores = score[i]
+            # print(sub_cnt, _, scores)
+            scores[j] = scores[j] if scores[j] >= s else s
+            score[i] = [sub_cnt + 1, idx, scores]
+        else:
+            scores = defaultdict(int)
+            scores[j] = s
+            score[i] = [1, idx, scores]
+            # print(score[i])
+
+    # 내 점수
+    my_score = sum(score[t][2].values())
+    for key, val in score.items():
+        rank.append((key, sum(val[2].values())))
+    rank.sort(reverse=1, key=lambda x: (x[1], -score[x[0]][0], -score[x[0]][1]))
+    for i in range(len(rank)):
+        if my_score > rank[i][1]:
+            print(i + 1)
+            break
+        elif my_score == rank[i][1]:
+            if score[rank[i][0]][0] > score[t][0]:
+                print(i + 1)
+                break
+            elif score[rank[i][0]][0] == score[t][0]:
+                if score[rank[i][0]][1] >= score[t][1]:
+                    print(i + 1)
+                    break
+    else:
+        print(len(rank) + 1)
 ```
 
 </div>
@@ -384,6 +429,61 @@ while True:
 ## [성구](<./인구 이동/성구.py>)
 
 ```py
+# 16234 인구이동
+import sys
+from collections import deque
+
+input = sys.stdin.readline
+
+# 토스트 계란...?
+
+# input
+N, L, R = map(int, input().split())
+country = [list(map(int, input().split())) for _ in range(N)]
+
+dir = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+
+def bfs(i, j):
+    total = country[i][j]
+    que = deque([(i, j)])
+    event = []
+    while que:
+        ii, jj = que.popleft()
+        for di, dj in dir:
+            ni, nj = ii + di, jj + dj
+            if (
+                0 <= ni < N
+                and 0 <= nj < N
+                and not visited[ni][nj]
+                and L <= abs(country[ii][jj] - country[ni][nj]) <= R
+            ):
+                visited[ni][nj] = 1
+                event.append((ni, nj))
+                que.append((ni, nj))
+                total += country[ni][nj]
+    if len(event):
+        event.append((i, j))
+        total //= len(event)
+
+        for i, j in event:
+            country[i][j] = total
+        return 1
+    else:
+        return 0
+
+for cnt in range(2000):
+    visited = [[0] * N for _ in range(N)]
+    events = {}
+    change = 0
+    for i in range(N):
+        for j in range(N):
+            if not visited[i][j]:
+                visited[i][j] = 1
+                change += bfs(i, j)
+    if not change:
+        print(cnt)
+        break
 
 ```
 
@@ -462,7 +562,41 @@ print(dp[-1][-1])
 ## [성구](<./로봇 조종하기/성구.py>)
 
 ```py
+# 2169 로봇 조종하기
+# 94128KB 1036 ms
+import sys
 
+input = sys.stdin.readline
+
+
+def solution(N, M, mars):
+    dp = [[-1000000001] * M for _ in range(N)]
+
+    dp[0][0] = mars[0][0]
+
+    for i in range(1, M):
+        dp[0][i] = dp[0][i - 1] + mars[0][i]
+
+    for i in range(1, N):
+        for j in range(M):
+            dp[i][j] = dp[i - 1][j] + mars[i][j]
+        tmp1 = dp[i].copy()
+        for j in range(1, M):
+            tmp1[j] = max(tmp1[j], tmp1[j - 1] + mars[i][j])
+        tmp2 = dp[i].copy()
+        for j in range(M - 2, -1, -1):
+            tmp2[j] = max(tmp2[j], tmp2[j + 1] + mars[i][j])
+        for j in range(M):
+            dp[i][j] = max(tmp1[j], tmp2[j])
+    print(dp[-1][-1])
+
+
+if __name__ == "__main__":
+    # input
+    N, M = map(int, input().split())
+
+    mars = [list(map(int, input().split())) for _ in range(N)]
+    solution(N, M, mars)
 ```
 
 </div>
