@@ -540,7 +540,41 @@ print(dp[-1][-1])
 ## [성구](<./로봇 조종하기/성구.py>)
 
 ```py
+# 2169 로봇 조종하기
+# 94128KB 1036 ms
+import sys
 
+input = sys.stdin.readline
+
+
+def solution(N, M, mars):
+    dp = [[-1000000001] * M for _ in range(N)]
+
+    dp[0][0] = mars[0][0]
+
+    for i in range(1, M):
+        dp[0][i] = dp[0][i - 1] + mars[0][i]
+
+    for i in range(1, N):
+        for j in range(M):
+            dp[i][j] = dp[i - 1][j] + mars[i][j]
+        tmp1 = dp[i].copy()
+        for j in range(1, M):
+            tmp1[j] = max(tmp1[j], tmp1[j - 1] + mars[i][j])
+        tmp2 = dp[i].copy()
+        for j in range(M - 2, -1, -1):
+            tmp2[j] = max(tmp2[j], tmp2[j + 1] + mars[i][j])
+        for j in range(M):
+            dp[i][j] = max(tmp1[j], tmp2[j])
+    print(dp[-1][-1])
+
+
+if __name__ == "__main__":
+    # input
+    N, M = map(int, input().split())
+
+    mars = [list(map(int, input().split())) for _ in range(N)]
+    solution(N, M, mars)
 ```
 
 </div>
